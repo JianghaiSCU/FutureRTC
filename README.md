@@ -5,20 +5,10 @@
   <p>A plug-and-play adaptation framework that predicts execution-time observations and states for asynchronous VLA control — without modifying the underlying policy.</p>
 
   <p>
-    <a href="TODO-paper-url"><img src="https://img.shields.io/badge/Paper-FutureRTC-b31b1b.svg" alt="Paper" /></a>
-    <a href="TODO-project-page"><img src="https://img.shields.io/badge/Project-Page-35b8a9.svg" alt="Project page" /></a>
-    <a href="LICENSE"><img src="https://img.shields.io/badge/License-TODO-f28c45.svg" alt="License" /></a>
+    <a href="https://arxiv.org/abs/2607.24008"><img src="https://img.shields.io/badge/Paper-FutureRTC-b31b1b.svg" alt="Paper" /></a>
+    <a href="https://jianghaiscu.github.io/FutureRTC_proj/"><img src="https://img.shields.io/badge/Project-Page-35b8a9.svg" alt="Project page" /></a>
   </p>
-
-  <p>
-    <a href="#overview">Overview</a> ·
-    <a href="#results-on-libero">Results</a> ·
-    <a href="#environment-setup">Setup</a> ·
-    <a href="#training">Training</a> ·
-    <a href="#evaluation">Evaluation</a> ·
-    <a href="#how-the-paper-maps-onto-this-code">Paper → Code</a> ·
-    <a href="#citation">Citation</a>
-  </p>
+  
 </div>
 
 ---
