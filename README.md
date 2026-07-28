@@ -251,11 +251,11 @@ assets/       LIBERO action statistics (quantiles, mean, std)
 
 ### Pretrained weights
 
-| File | Backbone | Parameters
+| File | Backbone | Parameters|
 |---|---|---|---|
-| `weights/predictor_pi05.pt` | π₀.₅ | 6,407,061
-| `weights/predictor_smolvla.pt` | SmolVLA-450M | 5,146,069
-| `weights/corrector.pt` | — | 40,328
+| `weights/predictor_pi05.pt` | π₀.₅ | 6,407,061|
+| `weights/predictor_smolvla.pt` | SmolVLA-450M | 5,146,069|
+| `weights/corrector.pt` | — | 40,328|
 
 ---
 
