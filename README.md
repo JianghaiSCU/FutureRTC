@@ -225,37 +225,13 @@ DELAYS=5 TASK_IDS=0 NUM_TRIALS=2 CPU_FRACTION=0.05 \
 
 ---
 
-## How the paper maps onto this code
-
-| Paper | Code |
-|---|---|
-| Observation prediction module | `predictor/model.py` — `MotionPriorLatentPredictor` |
-| ↳ motion-aware feature transport | the flow / strength / gain heads and the bilinear warp in `forward` |
-| ↳ reconstruction (innovation) | the gated `rrc` residual decoder on top of the transported feature |
-| State correction module | `corrector/` — SO(3) controller-target proxy + full-state residual MLP |
-| Policy consistency loss | `predictor/policy_loss/` — frozen flow head on predicted vs. true latent |
-| Asynchronous handoff schedule | `eval/schedule.py` |
-| Delay-swept LIBERO evaluation | `eval/driver.py` |
-
-```
-predictor/    observation prediction module: model, losses, dataset, policy consistency loss,
-              bank collectors, trainer
-corrector/    state correction module: SO(3) physics, network, dataset, trainer
-eval/         multi-delay LIBERO evaluation: schedule, driver, metrics, aggregation
-common/       shared backbone-facing infrastructure: backbone registry, runtime construction,
-              visual-latent capture/injection, action-space conversion
-launch/       one script per pipeline stage, per backbone, with the released hyperparameters
-weights/      trained observation-prediction and state-correction checkpoints
-assets/       LIBERO action statistics (quantiles, mean, std)
-```
-
 ### Pretrained weights
 
-| File | Backbone | Parameters|
+| File | Backbone | Parameters ||
 |---|---|---|---|
-| `weights/predictor_pi05.pt` | π₀.₅ | 6,407,061|
-| `weights/predictor_smolvla.pt` | SmolVLA-450M | 5,146,069|
-| `weights/corrector.pt` | — | 40,328|
+| `weights/predictor_pi05.pt` | π₀.₅ | 6,407,061 ||
+| `weights/predictor_smolvla.pt` | SmolVLA-450M | 5,146,069 ||
+| `weights/corrector.pt` | — | 40,328 | |
 
 ---
 
