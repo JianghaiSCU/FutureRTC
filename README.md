@@ -251,11 +251,11 @@ assets/       LIBERO action statistics (quantiles, mean, std)
 
 ### Pretrained weights
 
-| File | Backbone | Parameters | Trained through |
+| File | Backbone | Parameters
 |---|---|---|---|
-| `weights/predictor_pi05.pt` | π₀.₅ | 6,407,061 | phase 1, step 150,000 |
-| `weights/predictor_smolvla.pt` | SmolVLA-450M | 5,146,069 | phase 2, step 80,000 |
-| `weights/corrector.pt` | — | 40,328 | 100,000 steps |
+| `weights/predictor_pi05.pt` | π₀.₅ | 6,407,061
+| `weights/predictor_smolvla.pt` | SmolVLA-450M | 5,146,069
+| `weights/corrector.pt` | — | 40,328
 
 ---
 
@@ -289,10 +289,6 @@ forward-integrates; POLICY (`(env − mean)/std`) is what the flow head operates
 
 ---
 
-## License
-
-TODO
-
 ## Citation
 
 If FutureRTC helps your research, please cite our paper:
@@ -306,5 +302,4 @@ If FutureRTC helps your research, please cite our paper:
 FutureRTC builds on [LeRobot](https://github.com/huggingface/lerobot) and the π model family from
 [Physical Intelligence](https://www.physicalintelligence.company/), uses
 [SmolVLA](https://huggingface.co/lerobot/smolvla_base) as a second backbone, and evaluates in
-[LIBERO](https://github.com/Lifelong-Robot-Learning/LIBERO). The state correction module's SO(3)
-controller-target proxy is adapted from an action-to-state residual implementation.
+[LIBERO](https://github.com/Lifelong-Robot-Learning/LIBERO).
