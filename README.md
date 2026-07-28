@@ -1,9 +1,10 @@
+# FutureRTC: Real-Time Robot Execution with Anticipatory-Conditioned Action Chunking
+<h4 align="center">Hai Jiang<sup>1</sup>, Yixian Zou<sup>2</sup>, Binbin Liang<sup>1</sup>, Boqian Liu<sup>3</sup>, Fanman Meng<sup>2</sup>, Shuaicheng Liu<sup>2</sup></center>
+<h4 align="center">1.Sichuan University,
+<h4 align="center">2.University of Electronic Science and Technology of China,</center></center>
+<h4 align="center">3.University of Alberta</center></center>
+  
 <div align="center">
-
-  <h1>FutureRTC</h1>
-  <p><strong>Real-Time Robot Execution with Anticipatory-Conditioned Action Chunking</strong></p>
-  <p>A plug-and-play adaptation framework that predicts execution-time observations and states for asynchronous VLA control — without modifying the underlying policy.</p>
-
   <p>
     <a href="https://arxiv.org/abs/2607.24008"><img src="https://img.shields.io/badge/Paper-FutureRTC-b31b1b.svg" alt="Paper" /></a>
     <a href="https://jianghaiscu.github.io/FutureRTC_proj/"><img src="https://img.shields.io/badge/Project-Page-35b8a9.svg" alt="Project page" /></a>
@@ -17,10 +18,6 @@
 
 This repository is the official implementation of:
 
-> **FutureRTC: Real-Time Robot Execution with Anticipatory-Conditioned Action Chunking**<br>
-> Hai Jiang, Yixian Zou, Binbin Liang, Boqian Liu, Fanman Meng, Shuaicheng Liu.<br>
-> Sichuan University · University of Electronic Science and Technology of China · University of Alberta
-
 Real-time deployment of Vision-Language-Action (VLA) policies requires **asynchronous execution**:
 the next action chunk is computed while the current one is still running. That creates a
 **prediction–execution misalignment** — by the time a chunk takes over, the observation it was
@@ -28,21 +25,7 @@ computed from is already stale — which shows up as inter-chunk discontinuity. 
 either smooth the chunk boundary superficially, pay for costly policy optimization, or roll the
 proprioceptive state forward while ignoring the visual observation entirely.
 
-**FutureRTC** supplies the missing observation instead. It has two modules and one loss:
-
-- a **state correction module** that compensates for the gap between the rolled-forward and the
-  actual execution-time proprioceptive state;
-- an **observation prediction module** that forecasts the execution-time visual representation,
-  using robot motion as an explicit physical prior through motion-aware feature transport and
-  reconstruction;
-- a **policy consistency loss** that aligns the action chunks generated from predicted contexts with
-  those the policy would have produced from its true execution-time inputs.
-
-The base VLA policy stays **frozen throughout** — FutureRTC is a plug-and-play module, not a
-fine-tune.
-
-This release covers the **LIBERO** experiments end to end (data → training → evaluation) for both
-backbones reported in the paper: **π₀.₅** and **SmolVLA-450M**.
+![](./Figures/pipeline.jpg)
 
 ## Results on LIBERO
 
