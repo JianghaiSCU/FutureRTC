@@ -29,8 +29,6 @@ proprioceptive state forward while ignoring the visual observation entirely.
 - an **observation prediction module** that forecasts the execution-time visual representation,
   using robot motion as an explicit physical prior through motion-aware feature transport and
   reconstruction;
-- a **policy consistency loss** that aligns the action chunks generated from predicted contexts with
-  those the policy would have produced from its true execution-time inputs.
 
 The base VLA policy stays untouched throughout — FutureRTC is a plug-and-play module, not a
 fine-tune.
