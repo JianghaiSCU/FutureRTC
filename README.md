@@ -227,11 +227,11 @@ DELAYS=5 TASK_IDS=0 NUM_TRIALS=2 CPU_FRACTION=0.05 \
 
 ### Pretrained weights
 
-| File | Backbone | Parameters ||
-|---|---|---|---|
-| `weights/predictor_pi05.pt` | π₀.₅ | 6,407,061 ||
-| `weights/predictor_smolvla.pt` | SmolVLA-450M | 5,146,069 ||
-| `weights/corrector.pt` | — | 40,328 | |
+| File | Backbone |
+|---|---|
+| `weights/predictor_pi05.pt` | π₀.₅ |
+| `weights/predictor_smolvla.pt` | SmolVLA-450M |
+| `weights/corrector.pt` | — |
 
 ---
 
