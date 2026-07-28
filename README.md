@@ -15,9 +15,6 @@
 ---
 
 ## Overview
-
-This repository is the official implementation of:
-
 Real-time deployment of Vision-Language-Action (VLA) policies requires **asynchronous execution**:
 the next action chunk is computed while the current one is still running. That creates a
 **prediction–execution misalignment** — by the time a chunk takes over, the observation it was
@@ -25,13 +22,12 @@ computed from is already stale — which shows up as inter-chunk discontinuity. 
 either smooth the chunk boundary superficially, pay for costly policy optimization, or roll the
 proprioceptive state forward while ignoring the visual observation entirely.
 
-![](./Figures/pipeline.jpg)
+![](Figures/pipeline.jpg)
 
 ## Results on LIBERO
 
 Success rate (%) ↑ and execution steps ↓, averaged over the four LIBERO suites, at inference delays
-`d ∈ {5, 10, 15, 20}`. **One model is trained for all delays** — the delay is sampled
-`d ~ U[1, d_max]` during training, with no per-delay retraining. As reported in the paper:
+`d ∈ {5, 10, 15, 20}`. 
 
 <div align="center">
 
