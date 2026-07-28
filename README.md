@@ -4,7 +4,7 @@
 <h4 align="center">2.University of Electronic Science and Technology of China,</center></center>
 <h4 align="center">3.University of Alberta</center></center>
   
-<div align="center">
+<h4 align="center"> <div align="center">
   <p>
     <a href="https://arxiv.org/abs/2607.24008"><img src="https://img.shields.io/badge/Paper-FutureRTC-b31b1b.svg" alt="Paper" /></a>
     <a href="https://jianghaiscu.github.io/FutureRTC_proj/"><img src="https://img.shields.io/badge/Project-Page-35b8a9.svg" alt="Project page" /></a>
