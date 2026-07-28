@@ -185,8 +185,8 @@ python predictor/compute_latent_stats.py --bank-dir outputs/latent_bank_pi05
 
 | Phase | Loss | π₀.₅ | SmolVLA |
 |---|---|---|---|
-| 1 — reconstruction | `mse 1.0` | lr 1e-4, batch 64, 300k steps | lr 3e-4, batch 256, 150k steps |
-| 2 — policy consistency | `+ policy 10.0`, resumed from phase 1 | lr 1e-4, batch 16, 100k steps | lr 1e-4, batch 32, 100k steps |
+| 1 — reconstruction | `mse 1.0` | lr 1e-4, batch 64 | lr 3e-4, batch 256 |
+| 2 — policy consistency | `+ policy 10.0`, resumed from phase 1 | lr 1e-4, batch 16 | lr 1e-4, batch 32 |
 
 Both anneal the learning rate on a cosine schedule to `1e-6` and sample `d ~ U{1..20}`.
 
