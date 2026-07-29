@@ -33,8 +33,8 @@ FutureRTC on the bc31 base policy, averaged over the 12 levels and the execute-h
 
 | inference delay | 0 | 1 | 2 | 3 | 4 |
 |---|---|---|---|---|---|
-| avg. solve rate | 0.890 | 0.890 | 0.880 | 0.864 | 0.860 |
-| avg. execution time (env steps) | 92.3 | 92.5 | 94.8 | 96.6 | 98.1 |
+| avg. sucess rate | 89.0 | 89.0 | 88.0 | 86.4 | 86.0 |
+| avg. execution steps | 92.3 | 92.5 | 94.8 | 96.6 | 98.1 |
 
 Solve rate stays essentially flat as the delay grows — a **3.0%** drop from `d = 0` to `d = 4` —
 because the learned environment prediction absorbs the delay that a naive handoff would otherwise
