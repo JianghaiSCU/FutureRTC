@@ -15,25 +15,9 @@
 ---
 ## Overview
 
-Real-time deployment of Vision-Language-Action (VLA) policies requires **asynchronous execution**:
-the next action chunk is computed while the current one is still running. That creates a
-**prediction–execution misalignment** — by the time a chunk takes over, the observation it was
-computed from is already stale — which shows up as inter-chunk discontinuity. Existing methods
-either smooth the chunk boundary superficially, pay for costly policy optimization, or roll the
-proprioceptive state forward while ignoring the visual observation entirely.
+Real-time deployment of Vision-Language-Action (VLA) policies necessitates asynchronous execution, wherein subsequent action chunks are computed concurrently with the execution of the current chunk, leading to prediction-execution misalignment and manifesting as inter-chunk discontinuities. Existing methods either superficially smooth chunk boundaries, require costly policy optimization, or exclusively forward-predict proprioceptive states yet neglect critical visual observations. In this paper, we propose **FutureRTC**, a plug-and-play adaptation framework that predicts execution-time observations and states for asynchronous VLA control without modifying the underlying policy. Specifically, FutureRTC features a state correction module to compensate for the discrepancy between rolled-forward and actual execution-time proprioceptive states and an observation prediction module that forecasts execution-time visual representations by leveraging robot motion as an explicit physical prior through motion-aware feature transport and reconstruction. Furthermore, we introduce a policy consistency loss to align the action chunks generated from predicted contexts with those produced under the expected execution-time inputs of the VLA policy. Extensive experiments across simulated and real-world environments demonstrate that FutureRTC achieves superior robustness to inference delays, resulting in smoother trajectories, faster execution, and consistently higher task success rates. Code will be released to facilitate future research.
 
-**FutureRTC** supplies the missing observation instead. It has two modules and one loss:
-
-- a **state correction module** that compensates for the gap between the rolled-forward and the
-  actual execution-time proprioceptive state;
-- an **observation prediction module** that forecasts the execution-time visual representation,
-  using robot motion as an explicit physical prior through motion-aware feature transport and
-  reconstruction;
-
-The base VLA policy stays untouched throughout — FutureRTC is a plug-and-play module, not a
-fine-tune.
-
-![](Figures/execution_compare.png)
+![](Figures/teaser.jpg)
 
 ---
 
@@ -48,3 +32,21 @@ want to reproduce:
 | [`sim/libero`](../../tree/sim/libero) | LIBERO simulation | π₀.₅, SmolVLA-450M | Latent-bank collection, state-correction and observation-prediction training, delay-swept evaluation, trained checkpoints |
 | [`sim/Kinetix`](../../tree/sim/Kinetix) | Kinetix simulation | Action-chunking flow policies | 12 dynamic environments, delays `d ∈ [0, 4]` |
 | [`dev/realworld`](../../tree/dev/realworld) | Real-world bimanual | — | AgileX Cobot Magic deployment: *Stack Plates*, *Fold Towel*, *Hang Cups* |
+
+## Citation
+
+If FutureRTC helps your research, please cite our paper:
+
+```bibtex
+@article{jiang2027futurertc,
+  title={FutureRTC: Real-Time Robot Execution with Anticipatory-Conditioned Action Chunking},
+  author={Jiang, Hai and Zou, Yixian and Liang, Binbin and Liu, Boqian and Meng, Fanman and Liu, Shuaicheng},
+  journal={arXiv preprint arXiv:2607.24008},
+  year={2026}
+}
+```
+
+## License
+
+Released under the MIT License (see `LICENSE`). The RTC and Kinetix dependencies carry their own
+licenses.
