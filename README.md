@@ -14,10 +14,6 @@
 
 ---
 
-> **Real-world branch.** This branch holds the real-robot deployment of FutureRTC. For the simulated
-> experiments see [`sim/libero`](../../tree/sim/libero) and [`sim/Kinetix`](../../tree/sim/Kinetix);
-> for an overview of the whole project see [`main`](../../tree/main).
-
 ## Overview
 
 Under asynchronous control, inference is launched at `t = n·S − d` but the handoff only happens at
@@ -27,9 +23,6 @@ moment** (image latent + proprioceptive state), and feeds that into a **frozen**
 then behaves as if it had seen a fresh frame, which is what *anticipatory-conditioned* means:
 conditioning the policy on a predicted future observation.
 
-**Not a single policy parameter changes.** Only a 12.2M-parameter PyTorch side model is trained, and
-the entire chunk is usable from step 0 — no stale prefix is discarded.
-
 ### Hardware and tasks
 
 - **Robot** — AgileX / Piper dual-arm cobot, 14 DoF (left arm 6 + left gripper 1 + right arm 6 +
@@ -38,8 +31,6 @@ the entire chunk is usable from step 0 — no stale prefix is discarded.
 - **Base policy** — π₀.₅ from [openpi](https://github.com/Physical-Intelligence/openpi) (JAX).
 - **Tasks** — `plates_stacking`, `towel_folding`, `cup_hanging`.
 
-> **Scope.** This branch ships **FutureRTC only**. The baseline modes reported in the paper
-> (synchronous, naive-async, RTC, VLASH) are not included here.
 
 ---
 
@@ -56,10 +47,6 @@ realworld_cobot_release/
     └── cobot-magic-real/       # robot execution: Piper SDK / CAN / RealSense + deploy client
 ```
 
-**Why `train/` and `infer/` each carry a copy of openpi and `ours_pi05`:** they run on different
-machines. The dev machine trains and evaluates; the robot host only does inference and needs neither
-the training scripts nor a training stack.
-
 - `train/ours_pi05` is the **full** package (collect bank, train predictor, evaluate, deploy contract).
 - `infer/ours_pi05` keeps only the **deployment runtime**: `__init__ / action_space /
   deploy_protocol / openpi_bridge` plus `models/{corrector, predictor}`.
@@ -70,7 +57,7 @@ the training scripts nor a training stack.
 ### Implementation frameworks
 
 - The π₀.₅ policy is **JAX/Flax** (openpi).
-- The FutureRTC predictor is a standalone **PyTorch** model (12.23M parameters), attached to the
+- The FutureRTC predictor is a standalone **PyTorch** model, attached to the
   **frozen** JAX policy through a capture/inject bridge (`ours_pi05/openpi_bridge.py`).
 - On the robot, policy inference (JAX) and the predictor (PyTorch) **share one GPU**. Always set
   `XLA_PYTHON_CLIENT_PREALLOCATE=false` so XLA does not claim all the memory and the two coexist.
@@ -115,14 +102,14 @@ Trained once per task with openpi; FutureRTC then leaves it frozen.
 cd train/openpi
 # 1) compute norm stats
 uv run scripts/compute_norm_stats.py --config-name pi05_cobot_plates_stacking
-# 2) train (50k steps, global batch 8, FSDP over 2 GPUs, EMA off, full fine-tune)
+# 2) train (50k steps, global batch 8, EMA off, full fine-tune)
 uv run scripts/train.py pi05_cobot_plates_stacking --exp-name <run>   # add --resume to continue
 ```
 
 Configs for the three tasks: `pi05_cobot_plates_stacking`, `pi05_cobot_towel_folding`,
 `pi05_cobot_cup_hanging`.
 
-### 3.2 The FutureRTC predictor (the policy is not trained)
+### 3.2 The FutureRTC predictor
 
 Three steps: collect the latent bank → train the predictor → evaluate. All run in openpi's JAX
 environment, because they need to capture the policy's image latents.
@@ -155,9 +142,6 @@ CUDA_VISIBLE_DEVICES=0 XLA_PYTHON_CLIENT_PREALLOCATE=false \
   --predictor <predictor.pt> --train-config pi05_cobot_plates_stacking \
   --ckpt <policy_30000> --repo-id plates_stacking --episode 0 --out outputs/eval/openloop_plates
 ```
-
-Deployment uses the **step-60000** checkpoint. The predictor `.pt` is self-contained — it embeds
-`latent_norm` and `action_quantiles`, so deployment does not need the bank.
 
 > **Three ways to silently get wrong results**
 > - Set `HF_LEROBOT_HOME=<dataset root>` for every collect/eval run, or LeRobot goes looking on
@@ -219,12 +203,6 @@ d = 10                  inference delay
 H = 50                  chunk length returned by the server
 FIRE_STEP = S - d = 15  at the 15th raw action, a background thread launches the next query
 ```
-
-**FutureRTC executes `Cn[0:25]`** — the server has already predicted the observation forward to the
-handoff moment, so the whole chunk is fresh. This is the entire point of the method. An
-uncompensated asynchronous controller has to discard the stale prefix and execute `Cm[d:d+S]`
-instead; if you adapt the client and the slice drifts to that, you are running a system that claims
-delay compensation but does not perform it. Keep the slice at `[0:S]`.
 
 ### 4.3 Batch testing
 
