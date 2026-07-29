@@ -16,8 +16,8 @@
 
 ## Overview
 
-Under asynchronous control, inference is launched at `t = n·S − d` but the handoff only happens at
-`t = n·S`, so the policy is queried on a **stale observation**. FutureRTC uses the `d` actions that
+Under asynchronous control, inference is launched at `t = n·K − d` but the handoff only happens at
+`t = n·K`, so the policy is queried on a **stale observation**. FutureRTC uses the `d` actions that
 are already committed — and will certainly be executed — to predict the observation **at the handoff
 moment** (image latent + proprioceptive state), and feeds that into a **frozen** π₀.₅. The policy
 then behaves as if it had seen a fresh frame, which is what *anticipatory-conditioned* means:
