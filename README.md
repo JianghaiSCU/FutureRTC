@@ -31,7 +31,7 @@ want to reproduce:
 |---|---|---|---|
 | [`sim/libero`](../../tree/sim/libero) | LIBERO simulation | π₀.₅, SmolVLA-450M | Latent-bank collection, state-correction and observation-prediction training, delay-swept evaluation, trained checkpoints |
 | [`sim/Kinetix`](../../tree/sim/Kinetix) | Kinetix simulation | Action-chunking flow policies | 12 dynamic environments, delays `d ∈ [0, 4]` |
-| [`dev/realworld`](../../tree/dev/realworld) | Real-world bimanual | — | AgileX Cobot Magic deployment: *Stack Plates*, *Fold Towel*, *Hang Cups* |
+| [`dev/realworld`](../../tree/dev/realworld) | Real-world bimanual | π₀.₅ | AgileX Cobot Magic deployment: *Stack Plates*, *Fold Towel*, *Hang Cups* |
 
 ## Citation
 
