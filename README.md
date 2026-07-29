@@ -20,11 +20,6 @@
 
 ## Overview
 
-Action-chunking flow policies must commit to a chunk of actions while the next chunk is still being
-computed. Under an inference delay `d`, a naive controller keeps executing the stale chunk and then
-hands off to a chunk that was queried from an **out-of-date** observation, which degrades control as
-`d` grows.
-
 FutureRTC supplies the missing execution-time observation instead of smoothing over the seam. On
 Kinetix the observation splits cleanly into *robot* dimensions and *environment* dimensions, and the
 paper's two modules land on the two halves:
@@ -34,16 +29,6 @@ paper's two modules land on the two halves:
 | State correction module | **Exact forward simulation.** The `d` already-executed actions are replayed from the current state. Proprioception is fully known here, so this half needs no learning — where LIBERO must *learn* a residual correction, Kinetix gets it analytically. |
 | Observation prediction module | **Learned per-level latent predictor.** Given the current latent, the executed-action prefix and the delay, it predicts the environment's future observation latent. |
 
-Because RTC's `FlowPolicy` encodes the observation *linearly* (its first layer is linear over
-`concat[noisy_action, obs]`), the robot latent and the predicted environment latent can simply be
-**added** in latent space and decoded into the next action chunk. At `d = 0` the method reduces
-exactly to the plain no-delay policy. The base policy is never modified.
-
-Conceptually the handoff quality sits between the naive and oracle extremes:
-
-```
-naive (stale env)  <  FutureRTC (learned env)  <  oracle (true future env)
-```
 
 ## Results
 
@@ -69,9 +54,6 @@ VLASH and REMAC.
 | Python | **3.12** (the pinned jax/jaxlib have no cp313/cp314 wheels) |
 | Stack | JAX 0.4.35, flax, optax, numpy |
 | External | The Real-Time Chunking Kinetix repo (Stages 1 and 3 only) |
-
-> This branch is a **JAX** codebase and does not share an environment with
-> [`sim/libero`](../../tree/sim/libero), which is PyTorch/LeRobot. Keep them separate.
 
 ## Setup
 
@@ -128,14 +110,6 @@ python scripts/collect_latents.py \
 
 ### Stage 2 — train the observation prediction module
 
-One lightweight predictor per level. The entire objective is the mean squared error between the
-predicted and the target environment latent — no policy, feature or regularization terms — so this
-stage needs only the Stage-1 shards (no RTC env, no base policy):
-
-```
-loss = mean( (predict_obs_latent(z_s, motion_actions, delay) - z_env)**2 )
-```
-
 ```bash
 python scripts/train_predictor.py \
   --data-dir outputs/latents \
@@ -164,24 +138,6 @@ scratch with the MSE-only recipe.
 
 ---
 
-## Repository layout
-
-```
-src/motion_prior_handoff/
-  predictor.py    # the single-token latent predictor (the learned component)
-  flow_policy.py  # FlowPolicy observation-latent interface + level/delay utilities
-  rtc_env.py      # RTC/Kinetix bootstrap + env / policy / checkpoint loaders
-  robot_mask.py   # per-level robot vs. environment observation split
-  delay_grid.py   # (delay, execute_horizon) sweep enumeration
-  results.py      # record schema, aggregation, output writers
-scripts/
-  collect_latents.py  # Stage 1: on-policy environment-latent collection
-  train_predictor.py  # Stage 2: predictor training (MSE only)
-  eval_handoff.py     # Stage 3: delay-robustness sweep
-tests/                # CPU-only unit tests (predictor, delay grid, results)
-weights/predictors/   # 12 pretrained per-level predictors
-```
-
 ## Tests
 
 ```bash
@@ -189,16 +145,6 @@ python -m unittest discover -s tests -t . -p 'test_*.py' -v
 ```
 
 `test_predictor.py` needs JAX; the delay-grid and results tests run without it.
-
-## Notes
-
-- **Levels.** The 12 default levels are the RTC `worlds/l/*.json` set; use `--level-indices` to run a
-  subset (for example to shard training or evaluation across GPUs).
-- **Delay/horizon grid.** For each delay `d` the execute horizon ranges over `[max(1, d), 8 - d]`
-  (chunk size 8), matching RTC's oracle-delay sweep.
-- **Determinism.** All scripts take `--seed`; predictor heads are identity-initialized, so an
-  untrained predictor returns the input latent unchanged (a no-op handoff).
-- **Result records.** `results.jsonl` tags rows with `method: "futurertc"`.
 
 ---
 
@@ -210,7 +156,7 @@ If FutureRTC helps your research, please cite our paper:
 @inproceedings{jiang2027futurertc,
   title={FutureRTC: Real-Time Robot Execution with Anticipatory-Conditioned Action Chunking},
   author={Jiang, Hai and Zou, Yixian and Liang, Binbin and Liu, Boqian and Meng, Fanman and Liu, Shuaicheng},
-  booktitle={Proceedings of the AAAI Conference on Artificial Intelligence},
+  booktitle={},
   year={2027}
 }
 ```
