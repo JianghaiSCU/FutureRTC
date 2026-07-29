@@ -12,10 +12,11 @@
   
 </div>
 
-> **LIBERO branch.** This branch holds the LIBERO experiments.
 ---
+> **LIBERO branch.** This branch holds the LIBERO experiments.
 
 ## Overview
+
 Real-time deployment of Vision-Language-Action (VLA) policies requires **asynchronous execution**:
 the next action chunk is computed while the current one is still running. That creates a
 **prediction–execution misalignment** — by the time a chunk takes over, the observation it was
@@ -271,8 +272,18 @@ forward-integrates; POLICY (`(env − mean)/std`) is what the flow head operates
 If FutureRTC helps your research, please cite our paper:
 
 ```bibtex
-
+@inproceedings{jiang2027futurertc,
+  title={FutureRTC: Real-Time Robot Execution with Anticipatory-Conditioned Action Chunking},
+  author={Jiang, Hai and Zou, Yixian and Liang, Binbin and Liu, Boqian and Meng, Fanman and Liu, Shuaicheng},
+  booktitle={},
+  year={2026}
+}
 ```
+
+## License
+
+Released under the MIT License (see `LICENSE`). The RTC and Kinetix dependencies carry their own
+licenses.
 
 ## Acknowledgments
 
