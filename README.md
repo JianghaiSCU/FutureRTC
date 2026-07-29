@@ -33,7 +33,6 @@ paper's two modules land on the two halves:
 |---|---|
 | State correction module | **Exact forward simulation.** The `d` already-executed actions are replayed from the current state. Proprioception is fully known here, so this half needs no learning — where LIBERO must *learn* a residual correction, Kinetix gets it analytically. |
 | Observation prediction module | **Learned per-level latent predictor.** Given the current latent, the executed-action prefix and the delay, it predicts the environment's future observation latent. |
-| Policy consistency loss | **Not used on Kinetix** — the predictor is trained with plain MSE (see [Stage 2](#stage-2--train-the-observation-prediction-module)). |
 
 Because RTC's `FlowPolicy` encodes the observation *linearly* (its first layer is linear over
 `concat[noisy_action, obs]`), the robot latent and the predicted environment latent can simply be
