@@ -14,8 +14,6 @@
 
 ---
 
-> **Kinetix branch.** This branch holds the Kinetix experiments.
-
 ## Overview
 
 FutureRTC supplies the missing execution-time observation instead of smoothing over the seam. On
