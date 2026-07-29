@@ -13,7 +13,6 @@
 </div>
 
 ---
-> **LIBERO branch.** This branch holds the LIBERO experiments.
 
 ## Overview
 
