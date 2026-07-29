@@ -143,15 +143,6 @@ CUDA_VISIBLE_DEVICES=0 XLA_PYTHON_CLIENT_PREALLOCATE=false \
   --ckpt <policy_30000> --repo-id plates_stacking --episode 0 --out outputs/eval/openloop_plates
 ```
 
-> **Three ways to silently get wrong results**
-> - Set `HF_LEROBOT_HOME=<dataset root>` for every collect/eval run, or LeRobot goes looking on
->   HuggingFace and 404s.
-> - `eval_offline` (oracle-chunk reference, 200 fixed samples) and `eval_openloop_episode`
->   (synchronous-trajectory reference, one episode) report **different** `action_ratio` metrics.
->   They are not comparable across scripts — use `eval_offline` as the convergence criterion, not
->   the per-step RATIO in the training log.
-> - `XLA_PYTHON_CLIENT_PREALLOCATE=false` is mandatory whenever torch and JAX share a GPU.
-
 ---
 
 ## 4. Deployment
@@ -195,7 +186,7 @@ python deploy_policy_local_ours_batch_test.py --task plates_stacking \
 > Changing hardware means updating the RealSense serial numbers (grep `RealSenseCam`) and the CAN
 > ports.
 
-### 4.2 Timing contract (S = 25, d = 10, H = 50)
+### 4.2 Timing contract
 
 ```
 S = 25                  raw actions executed per window
@@ -215,11 +206,6 @@ where it stopped.
 Outputs land in `outputs/batch_test/<method>/<task>/`: `results.jsonl`, `results.txt`,
 `summary.json`, `video/*.mp4` (with `--save-video`), `actions/*.npz` (the executed raw actions, not
 the interpolated control points).
-
-Measurement settings: `S = 25`, 30 Hz, `MANUAL_DELAY = 0.15`, interpolation step
-`[0.015]*6 + [0.05]`. Metrics: success rate, executed raw-action steps, execution time, and
-observation→action round-trip latency (excluding the injected delay). The paper's baselines were
-measured under exactly these settings.
 
 ---
 
