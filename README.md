@@ -1,0 +1,229 @@
+# FutureRTC: Real-Time Robot Execution with Anticipatory-Conditioned Action Chunking
+<h4 align="center">Hai Jiang<sup>1</sup>, Yixian Zou<sup>2</sup>, Binbin Liang<sup>1</sup>, Boqian Liu<sup>3</sup>, Fanman Meng<sup>2</sup>, Shuaicheng Liu<sup>2</sup></center>
+<h4 align="center">1.Sichuan University,
+<h4 align="center">2.University of Electronic Science and Technology of China,</center></center>
+<h4 align="center">3.University of Alberta</center></center>
+
+<h4 align="center"> <div>
+  <p>
+    <a href="https://arxiv.org/abs/2607.24008"><img src="https://img.shields.io/badge/Paper-FutureRTC-b31b1b.svg" alt="Paper" /></a>
+    <a href="https://jianghaiscu.github.io/FutureRTC_proj/"><img src="https://img.shields.io/badge/Project-Page-35b8a9.svg" alt="Project page" /></a>
+  </p>
+
+</div>
+
+---
+
+> **Kinetix branch.** This branch holds the Kinetix experiments. For the LIBERO experiments see
+> [`sim/libero`](../../tree/sim/libero); for an overview of the whole project see
+> [`main`](../../tree/main).
+
+## Overview
+
+Action-chunking flow policies must commit to a chunk of actions while the next chunk is still being
+computed. Under an inference delay `d`, a naive controller keeps executing the stale chunk and then
+hands off to a chunk that was queried from an **out-of-date** observation, which degrades control as
+`d` grows.
+
+FutureRTC supplies the missing execution-time observation instead of smoothing over the seam. On
+Kinetix the observation splits cleanly into *robot* dimensions and *environment* dimensions, and the
+paper's two modules land on the two halves:
+
+| Paper | On Kinetix |
+|---|---|
+| State correction module | **Exact forward simulation.** The `d` already-executed actions are replayed from the current state. Proprioception is fully known here, so this half needs no learning — where LIBERO must *learn* a residual correction, Kinetix gets it analytically. |
+| Observation prediction module | **Learned per-level latent predictor.** Given the current latent, the executed-action prefix and the delay, it predicts the environment's future observation latent. |
+| Policy consistency loss | **Not used on Kinetix** — the predictor is trained with plain MSE (see [Stage 2](#stage-2--train-the-observation-prediction-module)). |
+
+Because RTC's `FlowPolicy` encodes the observation *linearly* (its first layer is linear over
+`concat[noisy_action, obs]`), the robot latent and the predicted environment latent can simply be
+**added** in latent space and decoded into the next action chunk. At `d = 0` the method reduces
+exactly to the plain no-delay policy. The base policy is never modified.
+
+Conceptually the handoff quality sits between the naive and oracle extremes:
+
+```
+naive (stale env)  <  FutureRTC (learned env)  <  oracle (true future env)
+```
+
+## Results
+
+FutureRTC on the bc31 base policy, averaged over the 12 levels and the execute-horizon sweep
+(2048 trials per level):
+
+| inference delay | 0 | 1 | 2 | 3 | 4 |
+|---|---|---|---|---|---|
+| avg. solve rate | 0.890 | 0.890 | 0.880 | 0.864 | 0.860 |
+| avg. execution time (env steps) | 92.3 | 92.5 | 94.8 | 96.6 | 98.1 |
+
+Solve rate stays essentially flat as the delay grows — a **3.0%** drop from `d = 0` to `d = 4` —
+because the learned environment prediction absorbs the delay that a naive handoff would otherwise
+pay in lost control. See the paper for the comparison against Naive Async., TE, BID, RTC, T-RTC,
+VLASH and REMAC.
+
+---
+
+## Requirements
+
+| Item | Recommendation |
+|------|----------------|
+| Python | **3.12** (the pinned jax/jaxlib have no cp313/cp314 wheels) |
+| Stack | JAX 0.4.35, flax, optax, numpy |
+| External | The Real-Time Chunking Kinetix repo (Stages 1 and 3 only) |
+
+> This branch is a **JAX** codebase and does not share an environment with
+> [`sim/libero`](../../tree/sim/libero), which is PyTorch/LeRobot. Keep them separate.
+
+## Setup
+
+This code builds on the Real-Time Chunking Kinetix codebase and does not vendor it:
+
+- **RTC repo** — <https://github.com/Physical-Intelligence/real-time-chunking-kinetix>. Clone it and
+  initialize its `third_party/kinetix` submodule (<https://github.com/FlairOx/Kinetix>). It provides
+  the Kinetix environment, the `FlowPolicy` (`src/model.py`), and `src/train_expert.py`.
+- **Base policy (bc31)** — a per-level BC flow-matching policy. Download one from
+  `gs://rtc-assets/bc/`, or train it with the RTC repo's `src/train_flow.py`. We use the epoch-31
+  checkpoint ("bc31"). The loaders expect the layout `<run-path>/<step>/policies/<level_name>.pkl`
+  and select the highest-numbered `<step>`.
+
+```bash
+pip install -r requirements.txt
+```
+
+Stage 2 (training) needs only those packages. **Stages 1 and 3 additionally import the RTC repo**
+(its Kinetix env + `FlowPolicy`), so run them where that repo is importable — the simplest option is
+the RTC repo's own environment with `optax` added.
+
+### Paths
+
+Nothing is hardcoded; both variables are also settable per-command via `--rtc-root` / `--run-path`.
+
+| Variable | Description |
+|----------|-------------|
+| `RTC_ROOT` | Your Real-Time Chunking Kinetix checkout |
+| `RTC_BC_RUN_PATH` | Base-policy run path, laid out as `<run-path>/<step>/policies/<level>.pkl` |
+
+```bash
+export RTC_ROOT=/path/to/real-time-chunking-kinetix
+export RTC_BC_RUN_PATH=$RTC_ROOT/pretrained_bc31
+```
+
+---
+
+## Pipeline
+
+The method is trained and evaluated **per Kinetix level** (12 levels by default). To evaluate the
+shipped weights, skip to Stage 3.
+
+### Stage 1 — collect on-policy environment latents
+
+Rolls out the base policy and records `(z_s, motion_actions, delay) -> z_env` shards.
+
+> The predictor **must** be trained on-policy; off-policy or expert data collapses it.
+
+```bash
+python scripts/collect_latents.py \
+  --rtc-root "$RTC_ROOT" --run-path "$RTC_BC_RUN_PATH" \
+  --output-dir outputs/latents
+```
+
+### Stage 2 — train the observation prediction module
+
+One lightweight predictor per level. The entire objective is the mean squared error between the
+predicted and the target environment latent — no policy, feature or regularization terms — so this
+stage needs only the Stage-1 shards (no RTC env, no base policy):
+
+```
+loss = mean( (predict_obs_latent(z_s, motion_actions, delay) - z_env)**2 )
+```
+
+```bash
+python scripts/train_predictor.py \
+  --data-dir outputs/latents \
+  --output-dir outputs/predictors
+```
+
+### Stage 3 — evaluate
+
+Sweeps inference delays `0..4` over the execute-horizon grid, 2048 trials per level by default, and
+writes `results.jsonl` + `summary.csv`:
+
+```bash
+python scripts/eval_handoff.py \
+  --rtc-root "$RTC_ROOT" --run-path "$RTC_BC_RUN_PATH" \
+  --predictor-dir weights/predictors \
+  --delays 0,1,2,3,4 --output-dir outputs/eval
+```
+
+### Pretrained weights
+
+`weights/predictors/` ships the 12 per-level predictors (one `<level>.pkl` each, ~15 MB) that
+produce the [results](#results) above on the bc31 base policy. With them you can run Stage 3
+directly and skip Stages 1–2 — you still need the RTC repo and the bc31 base policy to evaluate.
+They are the same architecture this release trains; `train_predictor.py` reproduces them from
+scratch with the MSE-only recipe.
+
+---
+
+## Repository layout
+
+```
+src/motion_prior_handoff/
+  predictor.py    # the single-token latent predictor (the learned component)
+  flow_policy.py  # FlowPolicy observation-latent interface + level/delay utilities
+  rtc_env.py      # RTC/Kinetix bootstrap + env / policy / checkpoint loaders
+  robot_mask.py   # per-level robot vs. environment observation split
+  delay_grid.py   # (delay, execute_horizon) sweep enumeration
+  results.py      # record schema, aggregation, output writers
+scripts/
+  collect_latents.py  # Stage 1: on-policy environment-latent collection
+  train_predictor.py  # Stage 2: predictor training (MSE only)
+  eval_handoff.py     # Stage 3: delay-robustness sweep
+tests/                # CPU-only unit tests (predictor, delay grid, results)
+weights/predictors/   # 12 pretrained per-level predictors
+```
+
+## Tests
+
+```bash
+python -m unittest discover -s tests -t . -p 'test_*.py' -v
+```
+
+`test_predictor.py` needs JAX; the delay-grid and results tests run without it.
+
+## Notes
+
+- **Levels.** The 12 default levels are the RTC `worlds/l/*.json` set; use `--level-indices` to run a
+  subset (for example to shard training or evaluation across GPUs).
+- **Delay/horizon grid.** For each delay `d` the execute horizon ranges over `[max(1, d), 8 - d]`
+  (chunk size 8), matching RTC's oracle-delay sweep.
+- **Determinism.** All scripts take `--seed`; predictor heads are identity-initialized, so an
+  untrained predictor returns the input latent unchanged (a no-op handoff).
+- **Result records.** `results.jsonl` tags rows with `method: "futurertc"`.
+
+---
+
+## Citation
+
+If FutureRTC helps your research, please cite our paper:
+
+```bibtex
+@inproceedings{jiang2027futurertc,
+  title={FutureRTC: Real-Time Robot Execution with Anticipatory-Conditioned Action Chunking},
+  author={Jiang, Hai and Zou, Yixian and Liang, Binbin and Liu, Boqian and Meng, Fanman and Liu, Shuaicheng},
+  booktitle={Proceedings of the AAAI Conference on Artificial Intelligence},
+  year={2027}
+}
+```
+
+## License
+
+Released under the MIT License (see `LICENSE`). The RTC and Kinetix dependencies carry their own
+licenses.
+
+## Acknowledgments
+
+The Kinetix experiments build on
+[Real-Time Chunking Kinetix](https://github.com/Physical-Intelligence/real-time-chunking-kinetix)
+from [Physical Intelligence](https://www.physicalintelligence.company/) and on
+[Kinetix](https://github.com/FlairOx/Kinetix).

@@ -1,0 +1,14 @@
+# Direct Python dependencies for the motion-prior-handoff package.
+#
+# Pin: Python 3.12 (the jax/jaxlib versions below have no cp313/cp314 wheels).
+#
+# Stage 2 (train_predictor.py) needs only these packages.
+# Stages 1 and 3 (collect_latents.py / eval_handoff.py) additionally require the RTC repo
+# to be importable (its Kinetix submodule + FlowPolicy `model.py` + `train_expert`); the
+# simplest way is to run them inside the RTC repo's own environment and add `optax` there.
+# See the README "Setup" section.
+jax==0.4.35
+jaxlib==0.4.35
+flax>=0.10.0
+optax>=0.2.3
+numpy>=1.26
