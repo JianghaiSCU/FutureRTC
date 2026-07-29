@@ -257,6 +257,11 @@ If FutureRTC helps your research, please cite our paper:
 }
 ```
 
+## License
+
+Released under the MIT License (see `LICENSE`). The RTC and Kinetix dependencies carry their own
+licenses.
+
 ## Acknowledgments
 
 The real-world deployment builds on [openpi](https://github.com/Physical-Intelligence/openpi) and
