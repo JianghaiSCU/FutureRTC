@@ -151,10 +151,10 @@ python -m unittest discover -s tests -t . -p 'test_*.py' -v
 If FutureRTC helps your research, please cite our paper:
 
 ```bibtex
-@inproceedings{jiang2027futurertc,
+@article{jiang2027futurertc,
   title={FutureRTC: Real-Time Robot Execution with Anticipatory-Conditioned Action Chunking},
   author={Jiang, Hai and Zou, Yixian and Liang, Binbin and Liu, Boqian and Meng, Fanman and Liu, Shuaicheng},
-  booktitle={},
+  journal={arXiv preprint arXiv:2607.24008},
   year={2026}
 }
 ```
