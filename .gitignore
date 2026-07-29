@@ -1,0 +1,35 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# --- 虚拟环境 / 包管理器缓存 ---
+.venv/
+venv/
+.uv/
+
+# --- 训练 / 推理产物（勿提交，体积大且可再生）---
+outputs/            # 训练日志、预测器 ckpt、批量测试结果
+banks/              # latent bank（可由 collect_latents 重采）
+wandb/              # wandb 运行记录
+0-test-show/        # 开环对比图输出
+*.pt                # torch checkpoint（predictor）
+*.ckpt
+checkpoints/
+
+# --- 批量测试落盘 ---
+*.mp4               # 录像
+# 注：actions/*.npz 若要随实验保留，请在对应目录单独 `git add -f`
+
+# --- 数据集 / 缓存 ---
+*.hdf5
+.cache/
+
+# --- 系统 / 编辑器 ---
+.DS_Store
+*.swp
+*~
+
+# --- 保留：uv.lock / pyproject.toml / 各 openpi 自带的 .gitignore 不受此文件影响 ---
