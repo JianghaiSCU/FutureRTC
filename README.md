@@ -155,7 +155,7 @@ Reads only the dataset's state and action columns; no policy, no images.
 launch/train_corrector.sh 0 outputs/corrector/full_state_residual_d0_20.pt
 ```
 
-`d ~ U{0..20}`, AdamW, batch 512, cosine LR to 0, 100k steps.
+`d ~ U{1..20}`, AdamW, batch 512, cosine LR to 0, 100k steps.
 
 ### 2. Visual-latent bank
 
