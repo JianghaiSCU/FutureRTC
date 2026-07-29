@@ -14,9 +14,7 @@
 
 ---
 
-> **Kinetix branch.** This branch holds the Kinetix experiments. For the LIBERO experiments see
-> [`sim/libero`](../../tree/sim/libero); for an overview of the whole project see
-> [`main`](../../tree/main).
+> **Kinetix branch.** This branch holds the Kinetix experiments.
 
 ## Overview
 
@@ -157,7 +155,7 @@ If FutureRTC helps your research, please cite our paper:
   title={FutureRTC: Real-Time Robot Execution with Anticipatory-Conditioned Action Chunking},
   author={Jiang, Hai and Zou, Yixian and Liang, Binbin and Liu, Boqian and Meng, Fanman and Liu, Shuaicheng},
   booktitle={},
-  year={2027}
+  year={2026}
 }
 ```
 
