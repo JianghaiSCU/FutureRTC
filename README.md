@@ -45,8 +45,3 @@ If FutureRTC helps your research, please cite our paper:
   year={2026}
 }
 ```
-
-## License
-
-Released under the MIT License (see `LICENSE`). The RTC and Kinetix dependencies carry their own
-licenses.
