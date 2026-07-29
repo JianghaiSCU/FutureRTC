@@ -49,9 +49,9 @@ VLASH and REMAC.
 
 | Item | Recommendation |
 |------|----------------|
-| Python | **3.12** (the pinned jax/jaxlib have no cp313/cp314 wheels) |
+| Python | **3.12** |
 | Stack | JAX 0.4.35, flax, optax, numpy |
-| External | The Real-Time Chunking Kinetix repo (Stages 1 and 3 only) |
+| External | The Real-Time Chunking Kinetix repo |
 
 ## Setup
 
